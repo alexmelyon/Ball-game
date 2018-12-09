@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\PlayerController.cs" />
+     <Compile Include="Assets\RotateThis.cs" />
  <Reference Include="Unity.PackageManagerUI.Editor">
  <HintPath>C:/workspace/CBBall/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
  </Reference>

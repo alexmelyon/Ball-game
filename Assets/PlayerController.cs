@@ -2,28 +2,45 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour
+{
 
+	public GameObject cameraParent;
 	public Vector3 cameraDelta = new Vector3(0, 5, -7);
 	public float forceMultiply = 10F;
 	public GameObject spawn;
 
-	private bool isCollides = false;
+	private int collidesCount = 0;
+	private Vector3 lastPos;
+	private float angle;
 
-	void Start() {
+	void Start()
+	{
 		transform.position = spawn.transform.position;
+		lastPos = transform.position;
 	}
 
-	void Update () {
+	void Update()
+	{
 		PlaceCameraBehindTheSphere();
 		MoveSphere();
 	}
 
-	void PlaceCameraBehindTheSphere() {
+	void PlaceCameraBehindTheSphere()
+	{
 		Camera.main.transform.position = transform.position + cameraDelta;
+
+		// TODO Use angle
+		// cameraParent.transform.position = transform.position;
+		// angle = Vector3.SignedAngle(Vector3.forward, transform.position - lastPos, Vector3.up);
+		// cameraParent.transform.rotation = Quaternion.Euler(0, angle, 0);
+
+
+		lastPos = transform.position;
 	}
 
-	void MoveSphere() {
+	void MoveSphere()
+	{
 		Vector3 force = new Vector3();
 		if(Input.GetKey(KeyCode.W)) {
 			force.z = 1;
@@ -36,23 +53,28 @@ public class PlayerController : MonoBehaviour {
 			force.x = 1;
 		}
 		if(Input.GetKey(KeyCode.Space)) {
-			if(isCollides) {
+			if(collidesCount > 0) {
 				Debug.Log("JUMP");
 				force.y = 50;
 			}
 		}
+		// TODO Use angle
+		// force = Quaternion.Euler(0, angle, 0) * force;
 		GetComponent<Rigidbody>().AddForce(force * forceMultiply);
 	}
 
-	void OnCollisionEnter(Collision c) {
-		isCollides = true;
+	void OnCollisionEnter(Collision c)
+	{
+		collidesCount++;
 	}
 
-	void OnCollisionExit(Collision c) {
-		isCollides = false;
+	void OnCollisionExit(Collision c)
+	{
+		collidesCount--;
 	}
 
-	void OnTriggerEnter(Collider c) {
+	void OnTriggerEnter(Collider c)
+	{
 		if(c.tag.Equals("Respawn")) {
 			Debug.Log("RESPAWN " + c.gameObject.name);
 			spawn = c.gameObject;
