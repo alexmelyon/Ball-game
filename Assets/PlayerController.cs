@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class PlayerController : MonoBehaviour
 	public GameObject spawn;
 
 	private int collidesCount = 0;
-	private Vector3 lastPos;
+//	private Vector3 lastPos;
 	private float angle;
 	private bool doubleJump = false;
 	private bool doubleJumpUsed = false;
@@ -19,7 +20,7 @@ public class PlayerController : MonoBehaviour
 	void Start()
 	{
 		transform.position = spawn.transform.position;
-		lastPos = transform.position;
+//		lastPos = transform.position;
 
 //		Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Glass"));
 	}
@@ -28,6 +29,9 @@ public class PlayerController : MonoBehaviour
 	{
 		PlaceCameraBehindTheSphere();
 		MoveSphere();
+		if(Input.GetKey(KeyCode.Escape)) {
+			SceneManager.LoadScene("Menu");
+		}
 	}
 
 	void PlaceCameraBehindTheSphere()
@@ -38,9 +42,7 @@ public class PlayerController : MonoBehaviour
 		// cameraParent.transform.position = transform.position;
 		// angle = Vector3.SignedAngle(Vector3.forward, transform.position - lastPos, Vector3.up);
 		// cameraParent.transform.rotation = Quaternion.Euler(0, angle, 0);
-
-
-		lastPos = transform.position;
+		// lastPos = transform.position;
 	}
 
 	void MoveSphere()
@@ -87,21 +89,28 @@ public class PlayerController : MonoBehaviour
 
 	void OnTriggerEnter(Collider c)
 	{
-		if(c.tag.Equals("Respawn")) {
+		if(c.gameObject.CompareTag("Respawn")) {
 			Debug.Log("RESPAWN " + c.gameObject.name);
 			spawn = c.gameObject;
-		} else if(c.tag.Equals("Abyss")) {
+		} else if(c.gameObject.CompareTag("Abyss")) {
 			transform.position = spawn.transform.position;
 			GetComponent<Rigidbody>().velocity = Vector3.zero;
 			GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-		} else if(c.tag.Equals("DoubleJump")) {
+		} else if(c.gameObject.CompareTag("DoubleJump")) {
 			doubleJump = true;
+		} else if(c.gameObject.CompareTag("Finish")) {
+			StartCoroutine(LoadAuthors());
 		}
 	}
 
 	void OnTriggerExit(Collider c) {
-		if(c.tag.Equals("DoubleJump")) {
+		if(c.gameObject.CompareTag("DoubleJump")) {
 			doubleJump = false;
 		}
+	}
+
+	IEnumerator LoadAuthors() {
+		yield return new WaitForSeconds(3F);
+		SceneManager.LoadScene("Authors");
 	}
 }
