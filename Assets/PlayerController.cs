@@ -13,11 +13,15 @@ public class PlayerController : MonoBehaviour
 	private int collidesCount = 0;
 	private Vector3 lastPos;
 	private float angle;
+	private bool doubleJump = false;
+	private bool doubleJumpUsed = false;
 
 	void Start()
 	{
 		transform.position = spawn.transform.position;
 		lastPos = transform.position;
+
+//		Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Glass"));
 	}
 
 	void Update()
@@ -56,6 +60,10 @@ public class PlayerController : MonoBehaviour
 			if(collidesCount > 0) {
 				Debug.Log("JUMP");
 				force.y = 50;
+			} else if(doubleJump && !doubleJumpUsed) {
+				Debug.Log("DOUBLE JUMP " + GetComponent<Rigidbody>().velocity.y);
+				force.y = 50;
+				doubleJumpUsed = true;
 			}
 		}
 		// TODO Use angle
@@ -66,6 +74,10 @@ public class PlayerController : MonoBehaviour
 	void OnCollisionEnter(Collision c)
 	{
 		collidesCount++;
+		doubleJumpUsed = false;
+//		if(c.gameObject.tag.Equals("Glass")) {
+//			Physics.IgnoreCollision(GetComponent<Collider>(), c.collider);
+//		}
 	}
 
 	void OnCollisionExit(Collision c)
@@ -82,6 +94,14 @@ public class PlayerController : MonoBehaviour
 			transform.position = spawn.transform.position;
 			GetComponent<Rigidbody>().velocity = Vector3.zero;
 			GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+		} else if(c.tag.Equals("DoubleJump")) {
+			doubleJump = true;
+		}
+	}
+
+	void OnTriggerExit(Collider c) {
+		if(c.tag.Equals("DoubleJump")) {
+			doubleJump = false;
 		}
 	}
 }
